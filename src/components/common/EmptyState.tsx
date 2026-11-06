@@ -1,3 +1,5 @@
+"use client";
+
 import React, { ReactNode } from 'react';
 import { FileQuestion } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import {
   UserPlus,
   HeartPulse,
@@ -11,6 +13,10 @@ import {
   SlidersHorizontal,
   Calendar,
   Download,
+  ShieldAlert,
+  Activity,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
 import PageHeader from '@/components/common/PageHeader';
@@ -35,7 +41,7 @@ export default function Patients() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 7;
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -96,7 +102,30 @@ export default function Patients() {
     return filteredPatients.slice(startIndex, startIndex + pageSize);
   }, [filteredPatients, currentPage, pageSize]);
 
+  // Vitals breakdown
+  const criticalCount = patients.filter((p) => p.status === 'Critical').length;
+  const observationCount = patients.filter((p) => p.status === 'Under Observation').length;
+  const activeCount = patients.filter((p) => p.status === 'Active').length;
+  const recoveredCount = patients.filter((p) => p.status === 'Recovered').length;
+
   const handleExportPatients = () => {
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      'ID,Name,Email,Phone,Age,Gender,Condition,Status,Doctor,RegisteredDate\n' +
+      filteredPatients
+        .map(
+          (p) =>
+            `"${p.id}","${p.name}","${p.email}","${p.phone}",${p.age},"${p.gender}","${p.condition}","${p.status}","${p.doctorName}","${p.registeredDate}"`
+        )
+        .join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `patient_registry_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     toast.success('Patient Records Exported', {
       description: `Downloaded ${filteredPatients.length} patient records as CSV.`,
     });
@@ -121,323 +150,297 @@ export default function Patients() {
   return (
     <DashboardLayout>
       <div className="space-y-6 pb-12">
-      {/* Header */}
-      <PageHeader
-        title="Patients Management"
-        description="Comprehensive clinical records of active hospital admissions, diagnostic history, and attending physician assignments."
-        badge={
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
-            {patients.length} Total Patients
-          </span>
-        }
-        actions={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleExportPatients}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors cursor-pointer shadow-2xs"
-            >
-              <Download className="h-3.5 w-3.5 text-slate-500" />
-              <span>Export</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-xs transition-all cursor-pointer"
-            >
-              <UserPlus className="h-4 w-4" />
-              <span>Admit / Add Patient</span>
-            </button>
-          </div>
-        }
-      />
-
-      {/* Patient Stats Strips */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-          <p className="text-xs text-slate-500 font-medium">Total Inpatients</p>
-          <p className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">{patients.length}</p>
-        </div>
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-          <p className="text-xs text-slate-500 font-medium">Under Treatment</p>
-          <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">
-            {patients.filter((p) => p.status === 'Active').length}
-          </p>
-        </div>
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-          <p className="text-xs text-slate-500 font-medium">Recovered</p>
-          <p className="text-xl sm:text-2xl font-bold text-emerald-600 mt-1">
-            {patients.filter((p) => p.status === 'Recovered').length}
-          </p>
-        </div>
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-          <p className="text-xs text-slate-500 font-medium">Critical Watch</p>
-          <p className="text-xl sm:text-2xl font-bold text-rose-600 mt-1">
-            {patients.filter((p) => p.status === 'Critical').length}
-          </p>
-        </div>
-      </div>
-
-      {/* Search and Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-        <SearchInput
-          value={searchTerm}
-          onChange={(val) => {
-            setSearchTerm(val);
-            setCurrentPage(1);
-          }}
-          placeholder="Search by patient name, condition, or doctor..."
-          className="max-w-md"
-        />
-
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-          <FilterDropdown
-            label="Condition"
-            value={conditionFilter}
-            onChange={(val) => {
-              setConditionFilter(val);
-              setCurrentPage(1);
-            }}
-            options={conditionOptions}
-            icon={<HeartPulse className="h-3.5 w-3.5" />}
-          />
-
-          <FilterDropdown
-            label="Doctor"
-            value={doctorFilter}
-            onChange={(val) => {
-              setDoctorFilter(val);
-              setCurrentPage(1);
-            }}
-            options={doctorOptions}
-            icon={<Stethoscope className="h-3.5 w-3.5" />}
-          />
-
-          <FilterDropdown
-            label="Status"
-            value={statusFilter}
-            onChange={(val) => {
-              setStatusFilter(val);
-              setCurrentPage(1);
-            }}
-            options={statusOptions}
-            icon={<SlidersHorizontal className="h-3.5 w-3.5" />}
-          />
-
-          <FilterDropdown
-            label="Registered Year"
-            value={dateFilter}
-            onChange={(val) => {
-              setDateFilter(val);
-              setCurrentPage(1);
-            }}
-            options={[
-              { label: 'Registered 2024', value: '2024' },
-              { label: 'Registered 2023', value: '2023' },
-            ]}
-            icon={<Calendar className="h-3.5 w-3.5" />}
-          />
-        </div>
-      </div>
-
-      {/* Patients Data Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        {paginatedPatients.length === 0 ? (
-          <EmptyState
-            title="No patient records found"
-            description="No patients match your current search terms or filter selection."
-            action={
+        {/* Header */}
+        <PageHeader
+          title="Patient Directory & Census"
+          description="Inpatient admissions, medical history, clinical triage condition, and assigned attending physicians."
+          badge={
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200 shadow-2xs">
+              {patients.length} Active Records
+            </span>
+          }
+          actions={
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  setSearchTerm('');
-                  setConditionFilter('all');
-                  setDoctorFilter('all');
-                  setStatusFilter('all');
-                }}
-                className="px-4 py-2 text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-xl transition-colors cursor-pointer"
+                onClick={handleExportPatients}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors cursor-pointer shadow-2xs"
               >
-                Clear Filters
+                <Download className="h-3.5 w-3.5 text-slate-500" />
+                <span>Export CSV</span>
               </button>
-            }
-          />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <tr>
-                  <th scope="col" className="px-5 py-3.5">
-                    Patient Name
-                  </th>
-                  <th scope="col" className="px-4 py-3.5">
-                    Contact Details
-                  </th>
-                  <th scope="col" className="px-4 py-3.5">
-                    Medical Condition
-                  </th>
-                  <th scope="col" className="px-4 py-3.5">
-                    Attending Physician
-                  </th>
-                  <th scope="col" className="px-4 py-3.5">
-                    Status
-                  </th>
-                  <th scope="col" className="px-4 py-3.5">
-                    Registered Date
-                  </th>
-                  <th scope="col" className="px-5 py-3.5 text-right">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                {paginatedPatients.map((pat) => (
-                  <tr
-                    key={pat.id}
-                    className="hover:bg-slate-50/70 transition-colors group"
-                  >
-                    {/* Patient Name & Demographics */}
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-teal-50 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 ring-1 ring-teal-100">
-                          {pat.name.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-900 block text-sm">
-                            {pat.name}
-                          </span>
-                          <span className="text-xs text-slate-400 block">
-                            {pat.gender}, {pat.age} yrs • Blood {pat.bloodGroup || 'O+'}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
+              <button
+                type="button"
+                onClick={() => setIsAddModalOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
+              >
+                <UserPlus className="h-4 w-4" />
+                <span>Admit New Patient</span>
+              </button>
+            </div>
+          }
+        />
 
-                    {/* Contact */}
-                    <td className="px-4 py-4 text-xs">
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate max-w-[160px]">{pat.email}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-slate-400 mt-0.5">
-                        <Phone className="h-3 w-3 text-slate-400 shrink-0" />
-                        <span>{pat.phone}</span>
-                      </div>
-                    </td>
-
-                    {/* Condition */}
-                    <td className="px-4 py-4">
-                      <span className="font-semibold text-slate-900 block">
-                        {pat.condition}
-                      </span>
-                      {pat.notes && (
-                        <span className="text-[11px] text-slate-400 block truncate max-w-[200px]">
-                          {pat.notes}
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Assigned Doctor */}
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-1.5">
-                        <Stethoscope className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-                        <span className="font-semibold text-slate-900 text-xs">
-                          {pat.doctorName}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-4 py-4">
-                      <StatusBadge status={pat.status} size="sm" />
-                    </td>
-
-                    {/* Registered Date */}
-                    <td className="px-4 py-4 text-xs text-slate-500">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{pat.registeredDate}</span>
-                      </div>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setEditingPatient(pat)}
-                          title="Edit Patient Information"
-                          className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Edit3 className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPatientToDelete({ id: pat.id, name: pat.name })}
-                          title="Delete Patient Record"
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Clinical Triage Vitals Ribbon */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Active Inpatient</p>
+            <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
           </div>
+          <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Critical Care</p>
+              {criticalCount > 0 && (
+                <span className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+              )}
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-rose-600 mt-1">{criticalCount}</p>
+          </div>
+          <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Observation</p>
+            <p className="text-xl sm:text-2xl font-bold text-amber-500 mt-1">{observationCount}</p>
+          </div>
+          <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Recovered</p>
+            <p className="text-xl sm:text-2xl font-bold text-emerald-600 mt-1">{recoveredCount}</p>
+          </div>
+        </div>
+
+        {/* Search and Filters Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+          <SearchInput
+            value={searchTerm}
+            onChange={(val) => {
+              setSearchTerm(val);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by patient name, phone, medical condition..."
+            className="max-w-md"
+          />
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+            <FilterDropdown
+              label="Diagnosis"
+              value={conditionFilter}
+              onChange={(val) => {
+                setConditionFilter(val);
+                setCurrentPage(1);
+              }}
+              options={conditionOptions}
+              icon={<HeartPulse className="h-3.5 w-3.5" />}
+            />
+
+            <FilterDropdown
+              label="Physician"
+              value={doctorFilter}
+              onChange={(val) => {
+                setDoctorFilter(val);
+                setCurrentPage(1);
+              }}
+              options={doctorOptions}
+              icon={<Stethoscope className="h-3.5 w-3.5" />}
+            />
+
+            <FilterDropdown
+              label="Status"
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setCurrentPage(1);
+              }}
+              options={statusOptions}
+              icon={<SlidersHorizontal className="h-3.5 w-3.5" />}
+            />
+          </div>
+        </div>
+
+        {/* Patients Data Table */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          {paginatedPatients.length === 0 ? (
+            <EmptyState
+              title="No patients found"
+              description="No patient records matched your active search query or filter criteria."
+              action={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setConditionFilter('all');
+                    setDoctorFilter('all');
+                    setStatusFilter('all');
+                  }}
+                  className="px-4 py-2 text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Clear All Filters
+                </button>
+              }
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm">
+                <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th scope="col" className="px-5 py-3.5">
+                      Patient
+                    </th>
+                    <th scope="col" className="px-4 py-3.5">
+                      Vitals / Age
+                    </th>
+                    <th scope="col" className="px-4 py-3.5">
+                      Diagnosis Condition
+                    </th>
+                    <th scope="col" className="px-4 py-3.5">
+                      Assigned Physician
+                    </th>
+                    <th scope="col" className="px-4 py-3.5">
+                      Admission Date
+                    </th>
+                    <th scope="col" className="px-4 py-3.5">
+                      Status
+                    </th>
+                    <th scope="col" className="px-5 py-3.5 text-right">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {paginatedPatients.map((pat) => (
+                    <tr
+                      key={pat.id}
+                      className="hover:bg-slate-50/70 transition-colors group"
+                    >
+                      {/* Name & Contact */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0 ring-1 ring-teal-200/60 shadow-2xs">
+                            {pat.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')}
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-900 block text-sm">
+                              {pat.name}
+                            </span>
+                            <span className="text-xs text-slate-400 block truncate max-w-[180px]">
+                              {pat.email}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Age & Blood Group */}
+                      <td className="px-4 py-4">
+                        <div className="space-y-1">
+                          <span className="text-xs text-slate-700 block font-semibold">
+                            {pat.age} yrs • {pat.gender}
+                          </span>
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            {pat.bloodGroup || 'O+'}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Condition */}
+                      <td className="px-4 py-4">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 font-semibold text-xs border border-teal-200/60">
+                          <HeartPulse className="h-3 w-3 text-teal-600" />
+                          {pat.condition}
+                        </span>
+                      </td>
+
+                      {/* Doctor */}
+                      <td className="px-4 py-4">
+                        <Link
+                          href={`/doctors/${pat.doctorId}`}
+                          className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-xs font-semibold group-hover:underline"
+                        >
+                          <Stethoscope className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                          <span>{pat.doctorName}</span>
+                        </Link>
+                      </td>
+
+                      {/* Admission Date */}
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-1.5 text-slate-600 text-xs font-mono">
+                          <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          <span>{pat.registeredDate}</span>
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-4 py-4">
+                        <StatusBadge status={pat.status} size="sm" />
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setEditingPatient(pat)}
+                            title="Edit Patient Record"
+                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPatientToDelete({ id: pat.id, name: pat.name })}
+                            title="Delete Patient Record"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Pagination bar */}
+          <div className="px-5 py-2">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredPatients.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </div>
+
+        {/* Add Patient Modal */}
+        <PatientFormModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmitPatient={addPatient}
+        />
+
+        {/* Edit Patient Modal */}
+        {editingPatient && (
+          <PatientFormModal
+            isOpen={Boolean(editingPatient)}
+            onClose={() => setEditingPatient(null)}
+            onSubmitPatient={handleUpdatePatient}
+            initialValues={editingPatient}
+            defaultDoctorId={editingPatient.doctorId}
+            title="Update Patient Medical Record"
+          />
         )}
 
-        {/* Pagination Bar */}
-        <div className="px-5">
-          <Pagination
-            currentPage={currentPage}
-            totalItems={filteredPatients.length}
-            pageSize={pageSize}
-            onPageChange={setCurrentPage}
-          />
-        </div>
-      </div>
-
-      {/* Add Patient Modal */}
-      <PatientFormModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmitPatient={addPatient}
-      />
-
-      {/* Edit Patient Modal */}
-      {editingPatient && (
-        <PatientFormModal
-          isOpen={Boolean(editingPatient)}
-          onClose={() => setEditingPatient(null)}
-          initialValues={{
-            name: editingPatient.name,
-            email: editingPatient.email,
-            phone: editingPatient.phone,
-            age: editingPatient.age,
-            gender: editingPatient.gender,
-            condition: editingPatient.condition,
-            status: editingPatient.status,
-            doctorId: editingPatient.doctorId,
-            bloodGroup: editingPatient.bloodGroup,
-            notes: editingPatient.notes,
-          }}
-          onSubmitPatient={handleUpdatePatient}
-          title="Edit Patient Record"
+        {/* Confirm Delete Dialog */}
+        <ConfirmDialog
+          isOpen={Boolean(patientToDelete)}
+          title="Delete Patient Record"
+          description={`Are you sure you want to delete ${patientToDelete?.name}'s medical record? This cannot be undone.`}
+          confirmLabel="Confirm Delete"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setPatientToDelete(null)}
         />
-      )}
-
-      {/* Confirm Delete Dialog */}
-      <ConfirmDialog
-        isOpen={Boolean(patientToDelete)}
-        title="Delete Patient Record"
-        description={`Are you sure you want to delete ${patientToDelete?.name}'s medical record? This cannot be undone.`}
-        confirmLabel="Confirm Delete"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setPatientToDelete(null)}
-      />
-    </div>
-  </DashboardLayout>
+      </div>
+    </DashboardLayout>
   );
 }
-

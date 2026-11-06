@@ -80,8 +80,9 @@ export interface PatientsPerDoctorMetric {
 }
 
 export interface SpecializationDistribution {
-  name: DoctorSpecialization;
+  name: DoctorSpecialization | string;
   value: number;
+  percentage?: number;
   color: string;
 }
 

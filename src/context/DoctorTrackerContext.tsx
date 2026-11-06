@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import {
   Doctor,
   Patient,
@@ -32,21 +32,72 @@ interface DoctorTrackerContextType {
   updatePatient: (id: string, updates: Partial<Patient>) => void;
   getDoctorById: (id: string) => Doctor | undefined;
   getPatientsByDoctorId: (doctorId: string) => Patient[];
+  resetDemoData: () => void;
 }
 
 const DoctorTrackerContext = createContext<DoctorTrackerContextType | undefined>(undefined);
 
+const STORAGE_KEYS = {
+  DOCTORS: 'doctor_tracker_doctors_v1',
+  PATIENTS: 'doctor_tracker_patients_v1',
+};
+
 export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [doctors, setDoctors] = useState<Doctor[]>(INITIAL_DOCTORS);
   const [patients, setPatients] = useState<Patient[]>(INITIAL_PATIENTS);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Safe client hydration from localStorage
+  useEffect(() => {
+    try {
+      const savedDocs = localStorage.getItem(STORAGE_KEYS.DOCTORS);
+      const savedPats = localStorage.getItem(STORAGE_KEYS.PATIENTS);
+      if (savedDocs) {
+        const parsedDocs = JSON.parse(savedDocs);
+        if (Array.isArray(parsedDocs) && parsedDocs.length > 0) {
+          setDoctors(parsedDocs);
+        }
+      }
+      if (savedPats) {
+        const parsedPats = JSON.parse(savedPats);
+        if (Array.isArray(parsedPats) && parsedPats.length > 0) {
+          setPatients(parsedPats);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read from local storage:', e);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  // Save changes to localStorage after hydration
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.DOCTORS, JSON.stringify(doctors));
+      } catch (e) {
+        console.warn('Could not save doctors:', e);
+      }
+    }
+  }, [doctors, isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(patients));
+      } catch (e) {
+        console.warn('Could not save patients:', e);
+      }
+    }
+  }, [patients, isHydrated]);
 
   // Dynamically computed stats
   const stats = useMemo<DashboardStats>(() => {
     const totalDoctors = doctors.length;
     const totalPatients = patients.length;
     const avg = totalDoctors > 0 ? Number((totalPatients / totalDoctors).toFixed(1)) : 0;
-    
-    // Count new patients this current month (assume 2024-02 or last 30 days)
+
     const newPatientsThisMonth = patients.filter((p) => {
       const regYearMonth = p.registeredDate.slice(0, 7);
       return regYearMonth === '2024-02' || regYearMonth === '2024-01';
@@ -64,7 +115,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
     };
   }, [doctors, patients]);
 
-  // Dynamically computed patients per doctor for bar chart
+  // Dynamically computed patients per doctor for charts
   const patientsPerDoctor = useMemo<PatientsPerDoctorMetric[]>(() => {
     return doctors.map((doc) => {
       const assignedCount = patients.filter((p) => p.doctorId === doc.id).length;
@@ -75,6 +126,29 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
       };
     });
   }, [doctors, patients]);
+
+  // Dynamically computed specialization distribution
+  const specializations = useMemo<SpecializationDistribution[]>(() => {
+    const counts: Record<string, number> = {};
+    doctors.forEach((d) => {
+      counts[d.specialization] = (counts[d.specialization] || 0) + 1;
+    });
+
+    const colors = [
+      '#2563EB', '#0D9488', '#F59E0B', '#8B5CF6',
+      '#EC4899', '#10B981', '#6366F1', '#14B8A6'
+    ];
+
+    const keys = Object.keys(counts);
+    if (keys.length === 0) return MOCK_SPECIALIZATION_DISTRIBUTION;
+
+    return keys.map((spec, idx) => ({
+      name: spec,
+      value: counts[spec],
+      percentage: Number(((counts[spec] / doctors.length) * 100).toFixed(1)),
+      color: colors[idx % colors.length],
+    }));
+  }, [doctors]);
 
   // Add doctor
   const addDoctor = (data: Omit<Doctor, 'id' | 'patientsCount' | 'joinedDate' | 'rating' | 'avatarUrl'> & { avatarUrl?: string }) => {
@@ -90,7 +164,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
     };
 
     setDoctors((prev) => [newDoc, ...prev]);
-    toast.success('Doctor registered successfully', {
+    toast.success('Physician registered successfully', {
       description: `${newDoc.name} has been added to the hospital directory.`,
     });
   };
@@ -99,9 +173,8 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
   const deleteDoctor = (id: string) => {
     const docToDelete = doctors.find((d) => d.id === id);
     setDoctors((prev) => prev.filter((d) => d.id !== id));
-    // Unassign or keep patients intact
-    toast.success('Doctor record removed', {
-      description: docToDelete ? `${docToDelete.name} was removed.` : 'Record deleted.',
+    toast.success('Physician record removed', {
+      description: docToDelete ? `${docToDelete.name} was removed from directory.` : 'Record deleted.',
     });
   };
 
@@ -110,7 +183,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
     setDoctors((prev) =>
       prev.map((d) => (d.id === id ? { ...d, ...updates } : d))
     );
-    toast.success('Doctor profile updated');
+    toast.success('Physician profile updated');
   };
 
   // Add patient
@@ -143,7 +216,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
     const patToDelete = patients.find((p) => p.id === id);
     setPatients((prev) => prev.filter((p) => p.id !== id));
     toast.success('Patient record archived', {
-      description: patToDelete ? `${patToDelete.name}'s record removed.` : 'Record removed.',
+      description: patToDelete ? `${patToDelete.name}'s record was removed.` : 'Record removed.',
     });
   };
 
@@ -160,6 +233,20 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
   const getPatientsByDoctorId = (doctorId: string) =>
     patients.filter((p) => p.doctorId === doctorId);
 
+  const resetDemoData = () => {
+    setDoctors(INITIAL_DOCTORS);
+    setPatients(INITIAL_PATIENTS);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.DOCTORS);
+      localStorage.removeItem(STORAGE_KEYS.PATIENTS);
+    } catch (e) {
+      console.warn(e);
+    }
+    toast.info('Demo Data Reset', {
+      description: 'Directory records restored to original clinical baseline.',
+    });
+  };
+
   return (
     <DoctorTrackerContext.Provider
       value={{
@@ -168,7 +255,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
         stats,
         registrationTrends: MOCK_REGISTRATION_TREND,
         patientsPerDoctor,
-        specializations: MOCK_SPECIALIZATION_DISTRIBUTION,
+        specializations,
         addDoctor,
         deleteDoctor,
         updateDoctor,
@@ -177,6 +264,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
         updatePatient,
         getDoctorById,
         getPatientsByDoctorId,
+        resetDemoData,
       }}
     >
       {children}

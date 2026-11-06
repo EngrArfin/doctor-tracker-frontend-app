@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 
-const baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT;
+const baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:3000";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: baseURL,
@@ -22,7 +22,7 @@ const baseQueryWithErrorHandler: typeof rawBaseQuery = async (
 ) => {
   const result = await rawBaseQuery(args, api, extraOptions);
 
-  // ✅ Global error handler
+  // Global 401 unauthenticated error handler
   if (result.error?.status === 401) {
     Cookies.remove("token");
     if (typeof window !== "undefined") {
@@ -36,6 +36,6 @@ const baseQueryWithErrorHandler: typeof rawBaseQuery = async (
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithErrorHandler,
-  tagTypes: ["User", "Payment"],
+  tagTypes: ["User", "Doctor", "Patient", "Analytics"],
   endpoints: () => ({}),
 });

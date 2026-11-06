@@ -1,7 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "@/redux/features/auth/authSlice";
-import cardReducer from "@/redux/features/card/cardSlice";
-
 import { baseApi } from "./hooks/baseApi";
 import {
   PERSIST,
@@ -14,19 +12,18 @@ import {
   persistStore,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-// PERSIST USER CONFIG
+
 const persistConfig = {
-  key: "user",
+  key: "doctor_tracker_auth",
   storage,
 };
 
-const persiterReducer = persistReducer(persistConfig, authReducer);
+const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
-    auth: persiterReducer,
-    card: cardReducer,
+    auth: persistedAuthReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -36,7 +33,6 @@ export const store = configureStore({
     }).concat(baseApi.middleware),
 });
 
-// Persistor for the store
 export const persistor = persistStore(store);
 
 export type AppRootState = ReturnType<typeof store.getState>;
