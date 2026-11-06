@@ -1,13 +1,19 @@
-import { cn } from "@/lib/utils"
+// src/components/ui/skeleton.tsx
+import React from "react";
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="skeleton"
-      className={cn("bg-accent animate-pulse rounded-md", className)}
-      {...props}
-    />
-  )
+// Utility function for joining class names
+function cn(...classes: (string | false | null | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
 }
 
-export { Skeleton }
+// Skeleton component props
+interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const Skeleton: React.FC<SkeletonProps> = ({ className, ...props }) => {
+  return (
+    <div
+      className={cn("animate-pulse bg-gray-200 rounded-md", className)}
+      {...props}
+    />
+  );
+};

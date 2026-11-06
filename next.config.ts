@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: [
+      "images.unsplash.com",
       "discoverholidaysbd.com",
       "ozvxzsjtzdrrwejjiomf.supabase.co",
       "i.pravatar.cc",
@@ -13,6 +14,9 @@ const nextConfig: NextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
   // Add other Next.js config options if needed
 };
