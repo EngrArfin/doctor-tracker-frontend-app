@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +10,7 @@ import Cookies from 'js-cookie';
 import { useLoginMutation } from '@/redux/features/auth/authApi';
 import { useAppDispatch } from '@/redux/hooks/redux-hook';
 import { setUser } from '@/redux/features/auth/authSlice';
+import loginPhoto from '@/assets/doctorTracker/photo/LoginPhoto.jpg';
 import {
   ShieldCheck,
   Lock,
@@ -16,11 +18,10 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Sparkles,
-  Users,
-  CheckCircle2,
   Stethoscope,
   HeartPulse,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -64,7 +65,7 @@ const LoginPage: React.FC = () => {
         dispatch(setUser({ user: res.data.user, token: res.data.accessToken }));
 
         toast.success(`Welcome back, ${res.data.user.name || 'User'}!`, {
-          description: `Signed in as ${res.data.user.email}. Redirecting to your dashboard...`,
+          description: `Signed in as ${res.data.user.email}. Redirecting to dashboard...`,
         });
 
         router.push('/dashboard');
@@ -112,13 +113,13 @@ const LoginPage: React.FC = () => {
     if (role === 'admin') {
       setValue('email', 'admin@doctortracker.com', { shouldValidate: true });
       setValue('password', 'adminPass2026!', { shouldValidate: true });
-      toast.info('Admin credentials loaded', {
+      toast.info('Admin demo credentials loaded', {
         description: 'admin@doctortracker.com',
       });
     } else {
       setValue('email', 'sarah.jenkins@mayoclinic.org', { shouldValidate: true });
       setValue('password', 'doctorPass2026!', { shouldValidate: true });
-      toast.info('Chief Physician credentials loaded', {
+      toast.info('Doctor demo credentials loaded', {
         description: 'sarah.jenkins@mayoclinic.org',
       });
     }
@@ -131,166 +132,191 @@ const LoginPage: React.FC = () => {
       return;
     }
     setShowForgotModal(false);
-    toast.success('Recovery link sent', {
-      description: `Password recovery instructions sent to ${forgotEmail}`,
+    toast.success('Password reset link sent', {
+      description: `Instructions sent to ${forgotEmail}`,
     });
     setForgotEmail('');
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#F8FAFC]">
-      {/* Left side: Premium Healthcare Brand Showcase (visible on lg screens) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A2540] p-12 text-white flex-col justify-between overflow-hidden">
-        {/* Ambient background glows */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-500/15 rounded-full blur-[140px] pointer-events-none" />
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white">
+      {/* Left Column: Full-Screen Edge-to-Edge Hero with LoginPhoto (Desktop) */}
+      <div className="relative hidden lg:flex lg:w-1/2 xl:w-7/12 min-h-screen flex-col justify-between p-12 xl:p-16 text-white overflow-hidden bg-slate-900">
+        {/* Full Screen Doctor Background Photo */}
+        <Image
+          src={loginPhoto}
+          alt="Doctor reviewing clinical records with patient"
+          fill
+          priority
+          sizes="(min-width: 1024px) 58vw, 100vw"
+          className="object-cover object-top select-none"
+        />
 
-        {/* Top Header */}
-        <div className="relative z-10">
+        {/* Cinematic Multi-stop Overlay to ensure pristine contrast and authentic human tone */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/75 z-10" />
+        <div className="absolute inset-0 bg-blue-950/20 mix-blend-multiply z-10" />
+
+        {/* Top Header: Hospital Brand */}
+        <div className="relative z-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 p-0.5 shadow-lg shadow-blue-500/20 flex items-center justify-center">
-              <div className="h-full w-full bg-slate-900 rounded-[10px] flex items-center justify-center">
-                <HeartPulse className="h-6 w-6 text-teal-400" />
-              </div>
+            <div className="h-11 w-11 rounded-2xl bg-blue-600/90 backdrop-blur-md border border-white/20 p-0.5 shadow-lg flex items-center justify-center">
+              <HeartPulse className="h-6 w-6 text-white" />
             </div>
             <div>
               <span className="text-xl font-bold tracking-tight text-white font-sans">
                 Doctor<span className="text-teal-400">Tracker</span>
               </span>
-              <span className="block text-[11px] font-medium tracking-wider uppercase text-slate-400">
-                Healthcare SaaS Platform
+              <span className="block text-[11px] font-medium tracking-wider uppercase text-slate-300">
+                Clinical Healthcare Platform
               </span>
             </div>
           </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs text-slate-200">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Hospital Shift Active</span>
+          </div>
         </div>
 
-        {/* Central Value Proposition */}
-        <div className="relative z-10 max-w-lg my-auto py-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-xs font-medium text-blue-300 mb-6 backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5 text-teal-300" />
-            <span>Next-Gen Medical Operations & Analytics</span>
+        {/* Center / Bottom: Inspiring Human Medical Message */}
+        <div className="relative z-20 max-w-xl my-auto py-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium text-teal-300 mb-6">
+            <Stethoscope className="h-4 w-4 text-teal-300" />
+            <span>Dedicated Physician & Patient Care</span>
           </div>
 
-          <h1 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            Unified physician workflow and real-time patient intelligence.
+          <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            Compassionate medical care, seamlessly coordinated.
           </h1>
 
-          <p className="mt-4 text-slate-300 text-sm leading-relaxed">
-            Engineered for hospital administrators, clinics, and health systems to track physician specializations, balance caseloads, and accelerate patient recovery.
+          <p className="mt-4 text-slate-200 text-sm xl:text-base leading-relaxed max-w-lg font-normal">
+            Empowering hospital teams and clinical administrators to monitor physician specializations, balance real-time patient caseloads, and improve treatment outcomes.
           </p>
 
-          {/* Key Metric Cards */}
-          <div className="grid grid-cols-2 gap-4 mt-8">
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-teal-400 mb-1">
-                <ShieldCheck className="h-4 w-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Security</span>
-              </div>
-              <p className="text-xl font-bold text-white">HIPAA Ready</p>
-              <p className="text-xs text-slate-400 mt-0.5">Encrypted audit logging</p>
+          <div className="mt-8 flex items-center gap-6 text-xs text-slate-300">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-teal-400" />
+              <span>Real-time Doctor Rosters</span>
             </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-blue-400 mb-1">
-                <Users className="h-4 w-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Scale</span>
-              </div>
-              <p className="text-xl font-bold text-white">100% Client-Side</p>
-              <p className="text-xs text-slate-400 mt-0.5">Fast local state reactive UX</p>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-teal-400" />
+              <span>Patient Admission Triage</span>
             </div>
-          </div>
-
-          {/* Feature checks */}
-          <div className="mt-8 space-y-2.5">
-            {[
-              'Interactive multi-specialty physician directory',
-              'Real-time patient caseload and admission trend charts',
-              'Quick-action modal for rapid patient and doctor onboarding',
-            ].map((feature, i) => (
-              <div key={i} className="flex items-center gap-2.5 text-xs text-slate-300">
-                <CheckCircle2 className="h-4 w-4 text-teal-400 shrink-0" />
-                <span>{feature}</span>
-              </div>
-            ))}
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-teal-400" />
+              <span>Multi-Specialty Analytics</span>
+            </div>
           </div>
         </div>
 
-        {/* Footer info */}
-        <div className="relative z-10 flex items-center justify-between text-xs text-slate-400 pt-6 border-t border-white/10">
-          <span>&copy; {new Date().getFullYear()} Doctor Tracker System</span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            System operational • v2.4.0
-          </span>
+        {/* Bottom Footer: Compliance & Copyright */}
+        <div className="relative z-20 flex items-center justify-between text-xs text-slate-300 pt-6 border-t border-white/15">
+          <span>&copy; {new Date().getFullYear()} Doctor Tracker Healthcare Systems</span>
+          <div className="flex items-center gap-2 font-medium text-teal-300">
+            <ShieldCheck className="h-4 w-4" />
+            <span>HIPAA Compliant & Encrypted</span>
+          </div>
         </div>
       </div>
 
-      {/* Right side: Login Form Container */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-16">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo (visible on small screens) */}
-          <div className="flex lg:hidden items-center gap-3 mb-8">
-            <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md">
-              <HeartPulse className="h-5 w-5 text-white" />
+      {/* Right Column: Full-Height Clean & Simple Login Form Container */}
+      <div className="w-full lg:w-1/2 xl:w-5/12 min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 bg-white overflow-y-auto">
+        
+        {/* Top Navbar / Mobile Header */}
+        <div className="flex items-center justify-between lg:justify-end mb-6">
+          {/* Mobile Brand */}
+          <div className="flex lg:hidden items-center gap-2.5">
+            <div className="h-9 w-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+              <HeartPulse className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
+              <span className="text-lg font-bold text-slate-900">
                 Doctor<span className="text-teal-600">Tracker</span>
-              </span>
-              <span className="block text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Clinical Admin Portal
               </span>
             </div>
           </div>
 
-          {/* Form Header */}
+          <div className="hidden lg:flex items-center gap-2 text-xs text-slate-500 font-medium">
+            <span>Support:</span>
+            <a
+              href="mailto:support@doctortracker.com"
+              className="text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              support@doctortracker.com
+            </a>
+          </div>
+        </div>
+
+        {/* Center: Main Human Form Container */}
+        <div className="max-w-md w-full mx-auto my-auto py-6">
+          
+          {/* Mobile Photo Banner (visible on screens < 1024px) */}
+          <div className="lg:hidden mb-6 rounded-2xl overflow-hidden border border-slate-200 shadow-sm relative h-44">
+            <Image
+              src={loginPhoto}
+              alt="Doctor reviewing charts"
+              fill
+              priority
+              className="object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-4">
+              <span className="text-white font-semibold text-sm">
+                Clinical Administration Portal
+              </span>
+              <span className="text-slate-300 text-xs">
+                Physician & Patient Management
+              </span>
+            </div>
+          </div>
+
+          {/* Heading */}
           <div className="mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
               Sign in to your account
             </h2>
             <p className="mt-2 text-sm text-slate-500">
-              Enter your clinical credentials to access the Doctor Tracker administrative dashboard.
+              Welcome back. Enter your clinical email and password to access the administrative dashboard.
             </p>
           </div>
 
-          {/* Quick Demo Credentials Banner */}
-          <div className="mb-6 p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/60">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-blue-900 flex items-center gap-1.5">
+          {/* Clean Quick Demo Accounts Switcher */}
+          <div className="mb-6 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                Quick Demo Accounts:
+                Quick Demo Access:
               </span>
-              <span className="text-[11px] text-blue-600 font-medium">Click to fill</span>
+              <span className="text-[11px] text-slate-400">Click to autofill</span>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => fillDemoCredentials('admin')}
-                className="flex-1 py-1.5 px-2.5 bg-white hover:bg-blue-50 text-slate-800 text-xs font-medium rounded-lg border border-blue-200 shadow-2xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="py-2 px-3 bg-white hover:bg-blue-50/70 hover:border-blue-300 text-slate-700 hover:text-blue-700 text-xs font-medium rounded-xl border border-slate-200 shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
-                Admin
+                Admin Demo
               </button>
               <button
                 type="button"
                 onClick={() => fillDemoCredentials('doctor')}
-                className="flex-1 py-1.5 px-2.5 bg-white hover:bg-teal-50 text-slate-800 text-xs font-medium rounded-lg border border-teal-200 shadow-2xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="py-2 px-3 bg-white hover:bg-teal-50/70 hover:border-teal-300 text-slate-700 hover:text-teal-700 text-xs font-medium rounded-xl border border-slate-200 shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
-                Physician
+                Doctor Demo
               </button>
             </div>
           </div>
 
-          {/* Main Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Email Field */}
             <div>
               <label
                 htmlFor="email"
                 className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5"
               >
-                Work Email Address
+                Clinical Work Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -300,7 +326,7 @@ const LoginPage: React.FC = () => {
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="name@hospital.org"
+                  placeholder="doctor@hospital.org"
                   {...register('email')}
                   className={`w-full pl-10 pr-4 py-2.5 text-sm bg-white border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all ${
                     errors.email
@@ -310,7 +336,7 @@ const LoginPage: React.FC = () => {
                 />
               </div>
               {errors.email && (
-                <p className="mt-1.5 text-xs text-rose-600 font-medium">
+                <p className="mt-1 text-xs text-rose-600 font-medium">
                   {errors.email.message}
                 </p>
               )}
@@ -341,7 +367,7 @@ const LoginPage: React.FC = () => {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  placeholder="Enter your security password"
+                  placeholder="••••••••"
                   {...register('password')}
                   className={`w-full pl-10 pr-11 py-2.5 text-sm bg-white border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all ${
                     errors.password
@@ -363,14 +389,14 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-rose-600 font-medium">
+                <p className="mt-1 text-xs text-rose-600 font-medium">
                   {errors.password.message}
                 </p>
               )}
             </div>
 
-            {/* Remember Me Checkbox */}
-            <div className="flex items-center justify-between">
+            {/* Remember Me */}
+            <div className="flex items-center pt-1">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -387,35 +413,42 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? (
                 <>
                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Authenticating...</span>
+                  <span>Signing in...</span>
                 </>
               ) : (
                 <>
-                  <span>Sign In to Dashboard</span>
+                  <span>Sign In</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Demo note */}
-          <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+          {/* Simple Clean Note */}
+          <div className="mt-8 pt-5 border-t border-slate-100 text-center">
             <p className="text-xs text-slate-400">
-              Hospital Management System • Frontend Demo Edition • All data is stored locally in-memory.
+              Protected by clinical encryption & access controls.
             </p>
           </div>
         </div>
+
+        {/* Bottom Footer on Right Panel */}
+        <div className="pt-4 border-t border-slate-100 text-center lg:text-left text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>Hospital Operations Dashboard</span>
+          <span>Version 2.4.0</span>
+        </div>
+
       </div>
 
-      {/* Forgot Password Modal (Visual Only with Toast feedback) */}
+      {/* Forgot Password Modal */}
       {showForgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <Lock className="h-5 w-5" />
@@ -436,7 +469,7 @@ const LoginPage: React.FC = () => {
                   type="email"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="name@hospital.org"
+                  placeholder="doctor@hospital.org"
                   className="w-full px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                   autoFocus
                 />
@@ -466,4 +499,3 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
-
