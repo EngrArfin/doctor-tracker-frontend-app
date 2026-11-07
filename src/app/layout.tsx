@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { DashboardToaster } from "@/components/ui/Toaster";
 import { DoctorTrackerProvider } from "@/context/DoctorTrackerContext";
+import ReduxProviderWrapper from "@/redux/redux-provider/reduxProviderWrapper";
 
 export const metadata: Metadata = {
   title: "Doctor Tracker — Clinical Administration Dashboard",
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased font-sans">
-        <DoctorTrackerProvider>
-          {children}
-          <DashboardToaster />
-        </DoctorTrackerProvider>
+        <ReduxProviderWrapper>
+          <DoctorTrackerProvider>
+            {children}
+            <DashboardToaster />
+          </DoctorTrackerProvider>
+        </ReduxProviderWrapper>
       </body>
     </html>
   );
