@@ -1,78 +1,63 @@
-// src/redux/features/auth/authApi.ts
-import { baseApi } from "@/redux/hooks/baseApi";
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: {
-    accessToken: string;
-    user: {
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-      image?: string | null;
-    };
-  };
-}
+import { baseApi } from '@/redux/hooks/baseApi';
+import {
+  LoginDto,
+  RegisterDto,
+  AuthResponse,
+  ProfileResponse,
+  LogoutResponse,
+} from './authType';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation<AuthResponse, LoginDto>({
       query: (credentials) => ({
-        url: "auth/login",
-        method: "POST",
+        url: '/auth/login',
+        method: 'POST',
         body: credentials,
       }),
+      invalidatesTags: ['Auth'],
     }),
 
-    logout: builder.mutation<{ message: string }, void>({
-      query: () => ({
-        url: "auth/logout",
-        method: "POST",
+    register: builder.mutation<AuthResponse, RegisterDto>({
+      query: (userData) => ({
+        url: '/auth/register',
+        method: 'POST',
+        body: userData,
       }),
+      invalidatesTags: ['Auth', 'User'],
+    }),
+
+    getProfile: builder.query<ProfileResponse, void>({
+      query: () => ({
+        url: '/auth/profile',
+        method: 'GET',
+      }),
+      providesTags: ['Auth'],
+    }),
+
+    getMe: builder.query<ProfileResponse, void>({
+      query: () => ({
+        url: '/auth/me',
+        method: 'GET',
+      }),
+      providesTags: ['Auth'],
+    }),
+
+    logout: builder.mutation<LogoutResponse, void>({
+      query: () => ({
+        url: '/auth/logout',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Auth'],
     }),
   }),
+  overrideExisting: false,
 });
 
-export const { useLoginMutation, useLogoutMutation } = authApi;
-
-// import { baseApi } from "@/redux/hooks/baseApi";
-// import { LoginResponse } from "@/redux/types/venue.type";
-
-// const authApi = baseApi.injectEndpoints({
-//   endpoints: (builder) => ({
-//     login: builder.mutation<LoginResponse, { email: string; password: string }>(
-//       {
-//         query: (userInfo) => ({
-//           url: "auth/login",
-//           method: "POST",
-//           body: userInfo,
-//         }),
-//       }
-//     ),
-
-//     logout: builder.mutation<{ message: string }, void>({
-//       query: () => ({
-//         url: "auth/logout",
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${
-//             typeof window !== "undefined"
-//               ? localStorage.getItem("token") || ""
-//               : ""
-//           }`,
-//         },
-//         body: {},
-//       }),
-//     }),
-//   }),
-// });
-
-// export const { useLoginMutation, useLogoutMutation } = authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useGetProfileQuery,
+  useGetMeQuery,
+  useLogoutMutation,
+} = authApi;
