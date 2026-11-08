@@ -29,6 +29,11 @@ import {
   Tooltip,
 } from 'recharts';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
+import { DoctorSpecialization, Patient } from '@/types';
+import {
+  useGetDoctorByIdQuery,
+  useGetDoctorPatientsQuery,
+} from '@/redux/features/doctor/doctorApi';
 import StatusBadge from '@/components/common/StatusBadge';
 import EmptyState from '@/components/common/EmptyState';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
@@ -42,8 +47,22 @@ export default function DoctorDetails() {
   const { getDoctorById, getPatientsByDoctorId, addPatient, deletePatient, updateDoctor } =
     useDoctorTracker();
 
-  const doctor = getDoctorById(id || '');
-  const associatedPatients = id ? getPatientsByDoctorId(id) : [];
+  const { data: backendDoc } = useGetDoctorByIdQuery(id, { skip: !id });
+  const { data: backendDocPatients } = useGetDoctorPatientsQuery(id, { skip: !id });
+
+  const contextDoctor = getDoctorById(id || '');
+  const doctor = backendDoc?.data
+    ? {
+        ...backendDoc.data,
+        specialization: backendDoc.data.specialization as DoctorSpecialization,
+      }
+    : contextDoctor;
+
+  const contextPatients = id ? getPatientsByDoctorId(id) : [];
+  const associatedPatients =
+    backendDocPatients?.data && backendDocPatients.data.length > 0
+      ? (backendDocPatients.data as Patient[])
+      : contextPatients;
 
   const [activeTab, setActiveTab] = useState<'patients' | 'analytics' | 'schedule'>('patients');
   const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);

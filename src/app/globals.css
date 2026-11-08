@@ -74,3 +74,74 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Sonner Toast Styling - Crystal Clear Contrast & High Legibility */
+[data-sonner-toast] {
+  font-family: var(--font-sans), sans-serif !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-weight: 700 !important;
+  font-size: 13.5px !important;
+  line-height: 1.35 !important;
+  color: #0f172a !important;
+}
+
+[data-sonner-toast] [data-description] {
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  margin-top: 3px !important;
+  color: #334155 !important; /* Always high contrast slate-700 */
+}
+
+/* Info toast contrast */
+[data-sonner-toast][data-type="info"] {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+[data-sonner-toast][data-type="info"] [data-title] {
+  color: #1e3a8a !important;
+}
+[data-sonner-toast][data-type="info"] [data-description] {
+  color: #1e40af !important;
+}
+
+/* Success toast contrast */
+[data-sonner-toast][data-type="success"] {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+[data-sonner-toast][data-type="success"] [data-title] {
+  color: #14532d !important;
+}
+[data-sonner-toast][data-type="success"] [data-description] {
+  color: #166534 !important;
+}
+
+/* Warning toast contrast */
+[data-sonner-toast][data-type="warning"] {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+[data-sonner-toast][data-type="warning"] [data-title] {
+  color: #78350f !important;
+}
+[data-sonner-toast][data-type="warning"] [data-description] {
+  color: #854d0e !important;
+}
+
+/* Error toast contrast */
+[data-sonner-toast][data-type="error"] {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+[data-sonner-toast][data-type="error"] [data-title] {
+  color: #7f1d1d !important;
+}
+[data-sonner-toast][data-type="error"] [data-description] {
+  color: #991b1b !important;
+}

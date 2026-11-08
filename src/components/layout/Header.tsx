@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import doctortrackerLogo from '@/assets/doctorTracker/icon/doctortrackerLogo.png';
 import {
@@ -15,8 +16,11 @@ import {
   LogOut,
   ShieldCheck,
   RotateCcw,
+  UserCog,
 } from 'lucide-react';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
+import { useAppSelector } from '@/redux/hooks/redux-hook';
+import { useCurrentUser } from '@/redux/features/auth/authSlice';
 
 interface HeaderProps {
   onToggleMobileSidebar: () => void;
@@ -32,10 +36,18 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCommandMenu,
 }) => {
   const router = useRouter();
+  const currentUser = useAppSelector(useCurrentUser);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>('');
   const { doctors, patients, resetData } = useDoctorTracker();
+
+  const userName = currentUser?.name || 'Dr. Alex Morgan';
+  const userEmail = currentUser?.email || 'admin@doctortracker.com';
+  const userRole = currentUser?.role === 'DOCTOR' ? 'Attending Physician' : 'Clinical Chief';
+  const userAvatar =
+    currentUser?.image ||
+    'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=96&h=96';
 
   // Real-time ticking clock (hospital operations local time)
   useEffect(() => {
@@ -257,34 +269,43 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=96&h=96"
-                alt="User profile"
+                src={userAvatar}
+                alt={userName}
                 className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-600/30"
               />
               <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
             </div>
             <div className="hidden sm:block text-left">
               <span className="block text-xs font-bold text-slate-900 leading-tight">
-                Dr. Alex Morgan
+                {userName}
               </span>
               <span className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                Clinical Chief
+                {userRole}
               </span>
             </div>
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-slate-200 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-3 py-2 border-b border-slate-100">
-                <p className="text-xs font-bold text-slate-900">Dr. Alex Morgan</p>
-                <p className="text-[11px] text-slate-500">admin@doctortracker.com</p>
+                <p className="text-xs font-bold text-slate-900">{userName}</p>
+                <p className="text-[11px] text-slate-500 truncate">{userEmail}</p>
                 <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 w-fit">
                   <ShieldCheck className="h-3 w-3" />
                   <span>Hospital Admin Access</span>
                 </div>
               </div>
 
-              <div className="py-1">
+              <div className="py-1 space-y-0.5">
+                <Link
+                  href="/profile"
+                  onClick={() => setShowUserMenu(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-xl transition-colors"
+                >
+                  <UserCog className="h-3.5 w-3.5 text-blue-600" />
+                  <span>Profile & Photo Settings</span>
+                </Link>
+
                 <button
                   type="button"
                   onClick={() => {

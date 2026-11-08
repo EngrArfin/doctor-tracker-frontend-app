@@ -14,9 +14,12 @@ import {
   PlusCircle,
   X,
   RotateCcw,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
+import { useAppSelector } from '@/redux/hooks/redux-hook';
+import { useCurrentUser } from '@/redux/features/auth/authSlice';
 
 interface SidebarProps {
   onCloseMobile?: () => void;
@@ -31,7 +34,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const currentUser = useAppSelector(useCurrentUser);
   const { doctors, patients, resetData } = useDoctorTracker();
+
+  const userName = currentUser?.name || 'Dr. Alex Morgan';
+  const userRole = currentUser?.role === 'DOCTOR' ? 'Attending Physician' : 'Clinical Chief Admin';
+  const userAvatar =
+    currentUser?.image ||
+    'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=96&h=96';
 
   const handleLogout = () => {
     router.push('/login');
@@ -58,6 +68,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Users,
       badge: patients.length,
       desc: 'Admitted registry',
+    },
+    {
+      to: '/profile',
+      label: 'My Profile',
+      icon: UserCog,
+      badge: null,
+      desc: 'Avatar & credentials',
     },
   ];
 
@@ -221,31 +238,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Bottom User Profile & Sign Out */}
       <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/60 shadow-2xs">
-          <div className="flex items-center gap-2.5 overflow-hidden">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/60 shadow-2xs hover:border-blue-200 transition-colors">
+          <Link
+            href="/profile"
+            onClick={onCloseMobile}
+            className="flex items-center gap-2.5 overflow-hidden flex-1 group cursor-pointer"
+            title="View & Edit Profile"
+          >
             <div className="relative shrink-0">
               <img
-                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=96&h=96"
-                alt="Dr. Alex Morgan"
-                className="h-8 w-8 rounded-lg object-cover ring-1 ring-slate-200"
+                src={userAvatar}
+                alt={userName}
+                className="h-8 w-8 rounded-lg object-cover ring-1 ring-slate-200 group-hover:ring-blue-400 transition-all"
               />
               <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-900 truncate">
-                Dr. Alex Morgan
+              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                {userName}
               </p>
               <p className="text-[10px] text-slate-500 font-medium truncate">
-                Clinical Chief Admin
+                {userRole}
               </p>
             </div>
-          </div>
+          </Link>
 
           <button
             type="button"
             onClick={handleLogout}
             title="Sign Out to Login"
-            className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+            className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer shrink-0 ml-1"
           >
             <LogOut className="h-4 w-4" />
           </button>

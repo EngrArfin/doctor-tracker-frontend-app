@@ -6,6 +6,11 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  image?: string | null;
+  phone?: string | null;
+  specialization?: string | null;
+  hospital?: string | null;
+  bio?: string | null;
 }
 
 export interface TAuth {
@@ -26,6 +31,19 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
     },
+    updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      } else {
+        state.user = {
+          id: 'admin-id',
+          email: action.payload.email || 'admin@doctortracker.com',
+          name: action.payload.name || 'Dr. Alex Morgan',
+          role: action.payload.role || 'ADMIN',
+          ...action.payload,
+        };
+      }
+    },
     logOut: (state) => {
       state.user = null;
       state.token = null;
@@ -33,7 +51,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, logOut } = authSlice.actions;
+export const { setUser, updateUserProfile, logOut } = authSlice.actions;
 export default authSlice.reducer;
 
 export const useCurrentToken = (state: AppRootState) => state.auth.token;
