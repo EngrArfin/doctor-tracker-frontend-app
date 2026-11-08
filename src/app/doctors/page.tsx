@@ -15,8 +15,6 @@ import {
   LayoutGrid,
   LayoutList,
   Mail,
-  Award,
-  Sparkles,
 } from 'lucide-react';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
 import PageHeader from '@/components/common/PageHeader';
@@ -186,53 +184,6 @@ export default function Doctors() {
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Avg Rating</p>
             <p className="text-xl sm:text-2xl font-bold text-amber-500 mt-1">★ 4.9</p>
           </div>
-        </div>
-
-        {/* Quick Specialty Pill Filter Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-          <button
-            type="button"
-            onClick={() => {
-              setSpecializationFilter('all');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-1.5 rounded-full font-semibold transition-all shrink-0 cursor-pointer ${
-              specializationFilter === 'all'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
-            }`}
-          >
-            All Disciplines ({doctors.length})
-          </button>
-          {SPECIALIZATION_LIST.map((spec) => {
-            const count = doctors.filter((d) => d.specialization === spec).length;
-            if (count === 0) return null;
-            const isSelected = specializationFilter === spec;
-            return (
-              <button
-                key={spec}
-                type="button"
-                onClick={() => {
-                  setSpecializationFilter(spec);
-                  setCurrentPage(1);
-                }}
-                className={`px-3 py-1.5 rounded-full font-semibold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
-                }`}
-              >
-                <span>{spec}</span>
-                <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
         </div>
 
         {/* Search, Filter & View Mode Switcher */}

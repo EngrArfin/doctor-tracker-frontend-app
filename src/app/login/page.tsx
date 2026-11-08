@@ -11,6 +11,7 @@ import { useLoginMutation } from '@/redux/features/auth/authApi';
 import { useAppDispatch } from '@/redux/hooks/redux-hook';
 import { setUser } from '@/redux/features/auth/authSlice';
 import loginPhoto from '@/assets/doctorTracker/photo/LoginPhoto.jpg';
+import doctortrackerLogo from '@/assets/doctorTracker/icon/doctortrackerLogo.png';
 import {
   ShieldCheck,
   Lock,
@@ -19,8 +20,6 @@ import {
   EyeOff,
   ArrowRight,
   Stethoscope,
-  HeartPulse,
-  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -71,7 +70,7 @@ const LoginPage: React.FC = () => {
       } else {
         toast.error(res?.message || 'Login failed. Please verify your credentials.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Demo fallback if backend is offline or demo accounts used
       if (
         data.email === 'admin@doctortracker.com' ||
@@ -95,13 +94,14 @@ const LoginPage: React.FC = () => {
         return;
       }
 
+      const errData = err as { data?: { message?: string | string[] }; message?: string };
       const errorMsg =
-        err?.data?.message ||
-        (Array.isArray(err?.data?.message) ? err.data.message.join(', ') : null) ||
-        err?.message ||
+        errData?.data?.message ||
+        (Array.isArray(errData?.data?.message) ? errData.data.message.join(', ') : null) ||
+        errData?.message ||
         'Invalid email or password';
       toast.error('Authentication Failed', {
-        description: errorMsg,
+        description: typeof errorMsg === 'string' ? errorMsg : 'Invalid email or password',
       });
     } finally {
       setIsLoading(false);
@@ -113,13 +113,13 @@ const LoginPage: React.FC = () => {
       setValue('email', 'admin@doctortracker.com', { shouldValidate: true });
       setValue('password', 'adminPass2026!', { shouldValidate: true });
       toast.info('Admin demo loaded', {
-        description: 'admin@doctortracker.com',
+        description: 'Credentials filled for admin@doctortracker.com',
       });
     } else {
       setValue('email', 'sarah.jenkins@mayoclinic.org', { shouldValidate: true });
       setValue('password', 'doctorPass2026!', { shouldValidate: true });
       toast.info('Doctor demo loaded', {
-        description: 'sarah.jenkins@mayoclinic.org',
+        description: 'Credentials filled for sarah.jenkins@mayoclinic.org',
       });
     }
   };
@@ -156,8 +156,15 @@ const LoginPage: React.FC = () => {
 
         {/* Top Header: Simple Brand */}
         <div className="relative z-20 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md">
-            <HeartPulse className="h-5 w-5" />
+          <div className="relative h-11 w-11 rounded-full overflow-hidden shadow-md ring-2 ring-white/30 shrink-0">
+            <Image
+              src={doctortrackerLogo}
+              alt="Doctor Tracker Logo"
+              fill
+              sizes="44px"
+              className="object-cover"
+              priority
+            />
           </div>
           <div>
             <span className="text-xl font-bold tracking-tight text-white font-sans">
@@ -184,8 +191,15 @@ const LoginPage: React.FC = () => {
 
         {/* Mobile Header (Screens < 1024px) */}
         <div className="flex lg:hidden items-center gap-2.5 mb-6">
-          <div className="h-9 w-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
-            <HeartPulse className="h-5 w-5" />
+          <div className="relative h-9 w-9 rounded-full overflow-hidden shadow-xs ring-1 ring-slate-200 shrink-0">
+            <Image
+              src={doctortrackerLogo}
+              alt="Doctor Tracker Logo"
+              fill
+              sizes="36px"
+              className="object-cover"
+              priority
+            />
           </div>
           <span className="text-lg font-bold text-slate-900">
             Doctor<span className="text-teal-600">Tracker</span>

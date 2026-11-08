@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   title: "Doctor Tracker — Clinical Administration Dashboard",
   description:
     "A modern, high-performance healthcare administrative dashboard engineered for clinical operations leads and hospital administrators.",
+  icons: {
+    icon: "/doctortrackerLogo.png",
+    shortcut: "/doctortrackerLogo.png",
+    apple: "/doctortrackerLogo.png",
+  },
 };
 
 export default function RootLayout({

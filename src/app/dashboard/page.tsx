@@ -8,15 +8,8 @@ import {
   UserPlus,
   Activity,
   ArrowUpRight,
-  ShieldAlert,
   ChevronRight,
   Download,
-  Calendar,
-  Sparkles,
-  HeartPulse,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -36,7 +29,6 @@ import { useDoctorTracker } from '@/context/DoctorTrackerContext';
 import StatCard from '@/components/common/StatCard';
 import ChartCard from '@/components/common/ChartCard';
 import StatusBadge from '@/components/common/StatusBadge';
-import PageHeader from '@/components/common/PageHeader';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import DoctorFormModal from '@/components/forms/DoctorFormModal';
 import PatientFormModal from '@/components/forms/PatientFormModal';
@@ -88,74 +80,37 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6 sm:space-y-8 pb-12">
-        {/* Welcome Greeting & Quick Telemetry Header */}
-        <div className="rounded-2xl bg-gradient-to-r from-[#0F172A] via-[#1E293B] to-[#0A2540] p-6 sm:p-7 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 right-32 -mb-10 w-48 h-48 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+        {/* Welcome Greeting Header */}
+        <div className="rounded-2xl bg-gray-500 p-6 sm:p-7 text-white shadow-lg shadow-blue-500/10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans">
+            Good morning, Dr. Alex Morgan
+          </h1>
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/20 text-xs font-semibold text-blue-300 mb-3 backdrop-blur-md">
-                <Sparkles className="h-3.5 w-3.5 text-teal-300" />
-                <span>Clinical Command Center</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-sans">
-                Good morning, Dr. Alex Morgan 👋
-              </h1>
-              <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Hospital census is steady. Telemetry node verified{' '}
-                <span className="font-semibold text-teal-300">
-                  {stats.totalDoctors} active physicians
-                </span>{' '}
-                and{' '}
-                <span className="font-semibold text-blue-300">
-                  {stats.totalPatients} registered patients
-                </span>.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <button
-                type="button"
-                onClick={handleExportSummary}
-                className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-200 bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl backdrop-blur-sm transition-all cursor-pointer shadow-sm"
-              >
-                <Download className="h-3.5 w-3.5 text-slate-300" />
-                <span>Export CSV</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsPatientModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-900 bg-teal-400 hover:bg-teal-300 rounded-xl transition-all cursor-pointer shadow-md shadow-teal-500/20 hover:scale-[1.02]"
-              >
-                <UserPlus className="h-3.5 w-3.5 text-slate-900" />
-                <span>Admit Patient</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsDoctorModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-all cursor-pointer shadow-md shadow-blue-500/25 hover:scale-[1.02]"
-              >
-                <Stethoscope className="h-3.5 w-3.5" />
-                <span>Add Doctor</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Quick telemetry indicators */}
-          <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-300">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Ward Inpatient Load: <strong>86% Optimal</strong></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-blue-400" />
-              <span>On-Call Physicians: <strong>6 Available</strong></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-teal-400" />
-              <span>Audit Logging: <strong>HIPAA Certified</strong></span>
-            </div>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleExportSummary}
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl backdrop-blur-xs transition-all cursor-pointer shadow-xs"
+            >
+              <Download className="h-3.5 w-3.5 text-white" />
+              <span>Export CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPatientModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-teal-950 bg-teal-300 hover:bg-teal-200 rounded-xl transition-all cursor-pointer shadow-sm hover:scale-[1.02]"
+            >
+              <UserPlus className="h-3.5 w-3.5 text-teal-950" />
+              <span>Admit Patient</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsDoctorModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-blue-900 bg-white hover:bg-blue-50 rounded-xl transition-all cursor-pointer shadow-sm hover:scale-[1.02]"
+            >
+              <Stethoscope className="h-3.5 w-3.5 text-blue-700" />
+              <span>Add Doctor</span>
+            </button>
           </div>
         </div>
 
@@ -207,22 +162,20 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => setTrendRange('6m')}
-                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                      trendRange === '6m'
-                        ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                        : 'hover:text-slate-900'
-                    }`}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${trendRange === '6m'
+                      ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                      : 'hover:text-slate-900'
+                      }`}
                   >
                     6 Months
                   </button>
                   <button
                     type="button"
                     onClick={() => setTrendRange('12m')}
-                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                      trendRange === '12m'
-                        ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                        : 'hover:text-slate-900'
-                    }`}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${trendRange === '12m'
+                      ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                      : 'hover:text-slate-900'
+                      }`}
                   >
                     12 Months
                   </button>
@@ -323,7 +276,7 @@ export default function Dashboard() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: any, name: any) => [`${value} physicians`, name]}
+                      formatter={(value, name) => [`${value} physicians`, String(name)]}
                       contentStyle={{
                         backgroundColor: '#FFFFFF',
                         borderRadius: '12px',
@@ -387,7 +340,7 @@ export default function Dashboard() {
                   tick={{ fontSize: 11, fill: '#64748B' }}
                 />
                 <Tooltip
-                  formatter={(value: any) => [`${value} active patients`, 'Assigned Caseload']}
+                  formatter={(value) => [`${value} active patients`, 'Assigned Caseload']}
                   contentStyle={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '12px',

@@ -293,7 +293,7 @@ export default function DoctorDetails() {
                 Associated Patients ({associatedPatients.length})
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Patients directly assigned under {doctor.name}'s care team
+                Patients directly assigned under {doctor.name}&apos;s care team
               </p>
             </div>
             <button

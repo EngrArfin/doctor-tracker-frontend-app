@@ -2,18 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
+import doctortrackerLogo from '@/assets/doctorTracker/icon/doctortrackerLogo.png';
 import {
   LayoutDashboard,
   Stethoscope,
   Users,
   LogOut,
   ShieldCheck,
-  HeartPulse,
   PlusCircle,
   X,
   RotateCcw,
-  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
@@ -71,10 +71,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onCloseMobile}
             className="flex items-center gap-2.5 group cursor-pointer"
           >
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-500 p-0.5 shadow-md shadow-blue-500/15 group-hover:shadow transition-all flex items-center justify-center">
-              <div className="h-full w-full bg-slate-900 rounded-[10px] flex items-center justify-center">
-                <HeartPulse className="h-4 w-4 text-teal-400 group-hover:scale-110 transition-transform" />
-              </div>
+            <div className="relative h-9 w-9 rounded-full overflow-hidden shadow-sm ring-2 ring-blue-600/20 group-hover:ring-blue-600/40 transition-all shrink-0">
+              <Image
+                src={doctortrackerLogo}
+                alt="Doctor Tracker Logo"
+                fill
+                sizes="36px"
+                className="object-cover"
+                priority
+              />
             </div>
             <div>
               <span className="text-base font-bold tracking-tight text-slate-900 font-sans flex items-center gap-0.5">

@@ -1,15 +1,10 @@
 import React from 'react';
-import { HeartPulse } from 'lucide-react';
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6">
-      <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 shadow-sm border border-blue-100">
-        <HeartPulse className="h-7 w-7 text-blue-600 animate-pulse" />
-      </div>
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-        Loading Doctor Tracker...
-      </p>
+    <div className="min-h-screen bg-slate-50/60 flex flex-col items-center justify-center p-6">
+      {/* Pure Circular Loader - No Icons */}
+      <div className="h-10 w-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

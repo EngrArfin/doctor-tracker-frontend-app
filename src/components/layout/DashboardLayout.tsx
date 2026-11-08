@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { DoctorTrackerProvider, useDoctorTracker } from '@/context/DoctorTrackerContext';
+import { useDoctorTracker } from '@/context/DoctorTrackerContext';
 import DoctorFormModal from '@/components/forms/DoctorFormModal';
 import PatientFormModal from '@/components/forms/PatientFormModal';
 import CommandMenu from '@/components/common/CommandMenu';

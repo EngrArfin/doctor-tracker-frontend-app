@@ -2,7 +2,7 @@
 
 import { toast as sonnerToast, Toaster } from "sonner";
 
-type ToastOptions = any;
+type ToastOptions = Parameters<typeof sonnerToast.success>[1];
 
 export const useToast = () => {
   return {

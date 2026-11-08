@@ -8,15 +8,9 @@ import {
   Stethoscope,
   Trash2,
   Edit3,
-  Phone,
-  Mail,
   SlidersHorizontal,
   Calendar,
   Download,
-  ShieldAlert,
-  Activity,
-  CheckCircle2,
-  AlertTriangle,
 } from 'lucide-react';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
 import PageHeader from '@/components/common/PageHeader';
@@ -39,7 +33,6 @@ export default function Patients() {
   const [conditionFilter, setConditionFilter] = useState('all');
   const [doctorFilter, setDoctorFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 7;
 
@@ -85,16 +78,9 @@ export default function Patients() {
 
       const matchesStatus = statusFilter === 'all' || pat.status === statusFilter;
 
-      const matchesDate = (() => {
-        if (dateFilter === 'all') return true;
-        if (dateFilter === '2024') return pat.registeredDate.startsWith('2024');
-        if (dateFilter === '2023') return pat.registeredDate.startsWith('2023');
-        return true;
-      })();
-
-      return matchesSearch && matchesCondition && matchesDoctor && matchesStatus && matchesDate;
+      return matchesSearch && matchesCondition && matchesDoctor && matchesStatus;
     });
-  }, [patients, searchTerm, conditionFilter, doctorFilter, statusFilter, dateFilter]);
+  }, [patients, searchTerm, conditionFilter, doctorFilter, statusFilter]);
 
   // Paginated patients
   const paginatedPatients = useMemo(() => {

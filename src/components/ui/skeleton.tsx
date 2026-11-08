@@ -7,7 +7,7 @@ function cn(...classes: (string | false | null | undefined)[]) {
 }
 
 // Skeleton component props
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type SkeletonProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const Skeleton: React.FC<SkeletonProps> = ({ className, ...props }) => {
   return (

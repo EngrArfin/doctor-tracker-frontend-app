@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   UserPlus,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
 import { useDoctorTracker } from '@/context/DoctorTrackerContext';
 
@@ -244,7 +243,7 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
         <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
           <span>Tip: Press ESC to dismiss</span>
           <span className="flex items-center gap-1 font-medium text-slate-500">
-            <Sparkles className="h-3 w-3 text-teal-600" />
+            <Search className="h-3 w-3 text-teal-600" />
             Universal Command Palette
           </span>
         </div>

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import doctortrackerLogo from '@/assets/doctorTracker/icon/doctortrackerLogo.png';
 import {
   Menu,
   Bell,
@@ -9,9 +11,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  Sparkles,
+  Activity,
   LogOut,
-  User,
   ShieldCheck,
   RotateCcw,
 } from 'lucide-react';
@@ -100,6 +101,23 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="h-5 w-5" />
         </button>
 
+        {/* Mobile brand display */}
+        <div className="flex lg:hidden items-center gap-2">
+          <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-xs ring-1 ring-slate-200 shrink-0">
+            <Image
+              src={doctortrackerLogo}
+              alt="Doctor Tracker Logo"
+              fill
+              sizes="32px"
+              className="object-cover"
+              priority
+            />
+          </div>
+          <span className="text-sm font-bold text-slate-900 tracking-tight">
+            Doctor<span className="text-teal-600">Tracker</span>
+          </span>
+        </div>
+
         {/* Global Search command palette trigger */}
         <div
           onClick={onOpenCommandMenu}
@@ -111,9 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="flex-1 text-slate-500 truncate text-[11px] sm:text-xs">
             Search doctors, patients, records...
           </span>
-          <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 bg-white border border-slate-200 rounded shadow-2xs">
-            <span>⌘</span>K
-          </kbd>
+
         </div>
       </div>
 
@@ -195,14 +211,13 @@ export const Header: React.FC<HeaderProps> = ({
                 {notificationsList.map((n) => (
                   <div
                     key={n.id}
-                    className={`p-2.5 rounded-xl transition-colors ${
-                      n.read ? 'hover:bg-slate-50 opacity-80' : 'bg-blue-50/40 hover:bg-blue-50/70'
-                    }`}
+                    className={`p-2.5 rounded-xl transition-colors ${n.read ? 'hover:bg-slate-50 opacity-80' : 'bg-blue-50/40 hover:bg-blue-50/70'
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                         {n.type === 'warning' && <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />}
-                        {n.type === 'info' && <Sparkles className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
+                        {n.type === 'info' && <Activity className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
                         {n.type === 'success' && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />}
                         {n.title}
                       </span>
