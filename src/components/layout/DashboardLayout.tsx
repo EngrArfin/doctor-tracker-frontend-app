@@ -62,7 +62,7 @@ const DashboardLayoutContent: React.FC<DashboardLayoutContentProps> = ({ childre
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
+      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen min-w-0 overflow-x-hidden">
         <Header
           onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           onOpenAddDoctor={() => setIsDoctorModalOpen(true)}
@@ -70,7 +70,7 @@ const DashboardLayoutContent: React.FC<DashboardLayoutContentProps> = ({ childre
           onOpenCommandMenu={() => setIsCommandMenuOpen(true)}
         />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-5 lg:p-8 max-w-7xl w-full mx-auto min-w-0">
           {children}
         </main>
       </div>

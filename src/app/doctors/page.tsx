@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Stethoscope,
@@ -43,6 +43,14 @@ export default function Doctors() {
   const [dateFilter, setDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = viewMode === 'grid' ? 6 : 8;
+  const [isContentLoading, setIsContentLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Modals state
   const [isAddDoctorModalOpen, setIsAddDoctorModalOpen] = useState(false);
@@ -259,7 +267,12 @@ export default function Doctors() {
         </div>
 
         {/* Content View: Grid or Table */}
-        {filteredDoctors.length === 0 ? (
+        {isContentLoading ? (
+          <div className="w-full p-16 text-center bg-white rounded-2xl border border-slate-200/80 shadow-xs flex flex-col items-center justify-center gap-3">
+            <div className="h-8 w-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs font-semibold text-slate-500">Loading physician directory...</p>
+          </div>
+        ) : filteredDoctors.length === 0 ? (
           <EmptyState
             title="No physicians found"
             description="No doctor records matched your search query or active filter criteria."
@@ -396,25 +409,25 @@ export default function Doctors() {
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <tr>
-                    <th scope="col" className="px-5 py-3.5">
+                    <th scope="col" className="px-5 py-3.5 whitespace-nowrap">
                       Physician
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Specialization
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Hospital Affiliation
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
-                      Phone & Contact
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
+                      Contact
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Caseload
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Status
                     </th>
-                    <th scope="col" className="px-5 py-3.5 text-right">
+                    <th scope="col" className="px-5 py-3.5 text-right whitespace-nowrap">
                       Actions
                     </th>
                   </tr>
@@ -426,21 +439,25 @@ export default function Doctors() {
                       className="hover:bg-slate-50/70 transition-colors group"
                     >
                       {/* Doctor name & email */}
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <img
                             src={doc.avatarUrl}
                             alt={doc.name}
                             className="h-10 w-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
                           />
-                          <div>
+                          <div className="min-w-0">
                             <Link
                               href={`/doctors/${doc.id}`}
-                              className="font-bold text-slate-900 hover:text-blue-600 transition-colors block text-sm"
+                              title={doc.name}
+                              className="font-bold text-slate-900 hover:text-blue-600 transition-colors block text-sm truncate max-w-[170px] sm:max-w-[210px]"
                             >
                               {doc.name}
                             </Link>
-                            <span className="text-xs text-slate-400 block truncate max-w-[180px]">
+                            <span
+                              title={doc.email}
+                              className="text-xs text-slate-400 block truncate max-w-[170px] sm:max-w-[210px]"
+                            >
                               {doc.email}
                             </span>
                           </div>
@@ -448,32 +465,34 @@ export default function Doctors() {
                       </td>
 
                       {/* Specialization */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold text-xs border border-blue-100">
-                          <Stethoscope className="h-3 w-3" />
-                          {doc.specialization}
+                          <Stethoscope className="h-3 w-3 shrink-0" />
+                          <span>{doc.specialization}</span>
                         </span>
                       </td>
 
                       {/* Hospital */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-1.5 text-slate-600 text-xs">
                           <Building2 className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                          <span className="truncate max-w-[180px]">{doc.hospital}</span>
+                          <span className="truncate max-w-[160px] sm:max-w-[200px]" title={doc.hospital}>
+                            {doc.hospital}
+                          </span>
                         </div>
                       </td>
 
                       {/* Phone */}
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-1.5 text-slate-600 text-xs">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 text-slate-600 text-xs font-mono">
                           <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                           <span>{doc.phone}</span>
                         </div>
                       </td>
 
                       {/* Patients Caseload */}
-                      <td className="px-4 py-4">
-                        <span className="font-bold text-slate-900 block">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <span className="font-bold text-slate-900 block text-xs sm:text-sm">
                           {doc.patientsCount} patients
                         </span>
                         <span className="text-[11px] text-amber-600 font-medium">
@@ -482,12 +501,12 @@ export default function Doctors() {
                       </td>
 
                       {/* Status */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <StatusBadge status={doc.status} size="sm" />
                       </td>
 
                       {/* Actions Dropdown / buttons */}
-                      <td className="px-5 py-4 text-right">
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <Link
                             href={`/doctors/${doc.id}`}

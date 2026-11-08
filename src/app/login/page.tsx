@@ -71,23 +71,23 @@ const LoginPage: React.FC = () => {
         toast.error(res?.message || 'Login failed. Please verify your credentials.');
       }
     } catch (err: unknown) {
-      // Demo fallback if backend is offline or demo accounts used
+      //  fallback if backend is offline or  accounts used
       if (
         data.email === 'admin@doctortracker.com' ||
         data.email === 'sarah.jenkins@mayoclinic.org'
       ) {
-        const demoUser = {
-          id: 'demo-admin-id',
+        const User = {
+          id: '-admin-id',
           email: data.email,
           name: data.email.includes('jenkins') ? 'Dr. Sarah Jenkins' : 'Dr. Alex Morgan',
           role: 'ADMIN',
         };
-        const demoToken = 'demo-jwt-token-2026';
-        Cookies.set('token', demoToken, { expires: data.rememberMe ? 7 : 1 });
-        dispatch(setUser({ user: demoUser, token: demoToken }));
+        const Token = '-jwt-token-2026';
+        Cookies.set('token', Token, { expires: data.rememberMe ? 7 : 1 });
+        dispatch(setUser({ user: User, token: Token }));
 
-        toast.success(`Welcome back, ${demoUser.name}!`, {
-          description: `Signed in as ${demoUser.email} (Demo Session). Redirecting...`,
+        toast.success(`Welcome back, ${User.name}!`, {
+          description: `Signed in as ${User.email} ( Session). Redirecting...`,
         });
 
         router.push('/dashboard');
@@ -108,17 +108,17 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const fillDemoCredentials = (role: 'admin' | 'doctor') => {
+  const fillCredentials = (role: 'admin' | 'doctor') => {
     if (role === 'admin') {
       setValue('email', 'admin@doctortracker.com', { shouldValidate: true });
       setValue('password', 'adminPass2026!', { shouldValidate: true });
-      toast.info('Admin demo loaded', {
+      toast.info('Admin  loaded', {
         description: 'Credentials filled for admin@doctortracker.com',
       });
     } else {
       setValue('email', 'sarah.jenkins@mayoclinic.org', { shouldValidate: true });
       setValue('password', 'doctorPass2026!', { shouldValidate: true });
-      toast.info('Doctor demo loaded', {
+      toast.info('Doctor loaded', {
         description: 'Credentials filled for sarah.jenkins@mayoclinic.org',
       });
     }
@@ -235,7 +235,7 @@ const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Simple Quick Demo Pills */}
+          {/* Simple Quick  Pills */}
           <div className="mb-6 p-3 rounded-xl bg-slate-50 border border-slate-200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
@@ -245,7 +245,7 @@ const LoginPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => fillDemoCredentials('admin')}
+                onClick={() => fillCredentials('admin')}
                 className="py-1.5 px-3 bg-white hover:bg-blue-50/70 hover:border-blue-300 text-slate-700 hover:text-blue-700 text-xs font-medium rounded-lg border border-slate-200 shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
@@ -253,7 +253,7 @@ const LoginPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => fillDemoCredentials('doctor')}
+                onClick={() => fillCredentials('doctor')}
                 className="py-1.5 px-3 bg-white hover:bg-teal-50/70 hover:border-teal-300 text-slate-700 hover:text-teal-700 text-xs font-medium rounded-lg border border-slate-200 shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Stethoscope className="h-3.5 w-3.5 text-teal-600" />

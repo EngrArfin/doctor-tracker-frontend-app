@@ -12,6 +12,7 @@ interface StatCardProps {
   icon: LucideIcon;
   variant?: 'blue' | 'teal' | 'indigo' | 'slate';
   className?: string;
+  isLoading?: boolean;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -22,6 +23,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   icon: Icon,
   variant = 'blue',
   className,
+  isLoading,
 }) => {
   const isPositive = typeof change === 'number' && change >= 0;
 
@@ -59,9 +61,13 @@ export const StatCard: React.FC<StatCardProps> = ({
             {title}
           </p>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl font-sans">
-              {value}
-            </span>
+            {isLoading ? (
+              <div className="h-7 w-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin my-0.5" />
+            ) : (
+              <span className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl font-sans">
+                {value}
+              </span>
+            )}
           </div>
         </div>
         <div

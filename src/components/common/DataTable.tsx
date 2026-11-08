@@ -60,7 +60,7 @@ export function DataTable<T>({
           <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
             <tr>
               {columns.map((col) => (
-                <th key={col.key} scope="col" className={cn('px-4 py-3.5', col.className)}>
+                <th key={col.key} scope="col" className={cn('px-4 py-3.5 whitespace-nowrap', col.className)}>
                   {col.header}
                 </th>
               ))}
@@ -77,7 +77,7 @@ export function DataTable<T>({
                 )}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className={cn('px-4 py-3.5', col.className)}>
+                  <td key={col.key} className={cn('px-4 py-3.5 whitespace-nowrap', col.className)}>
                     {col.render
                       ? col.render(item)
                       : // eslint-disable-next-line @typescript-eslint/no-explicit-any

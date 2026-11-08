@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>('');
-  const { doctors, patients, resetDemoData } = useDoctorTracker();
+  const { doctors, patients, resetData } = useDoctorTracker();
 
   // Real-time ticking clock (hospital operations local time)
   useEffect(() => {
@@ -186,7 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-slate-200/90 shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-2xl bg-white border border-slate-200/90 shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="flex items-center justify-between pb-2.5 px-1 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-slate-900">Clinical Alerts</span>
@@ -288,13 +288,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    resetDemoData();
+                    resetData();
                     setShowUserMenu(false);
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
                 >
                   <RotateCcw className="h-3.5 w-3.5 text-slate-500" />
-                  <span>Reset Demo Directory</span>
+                  <span>Reset Directory</span>
                 </button>
               </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Users,
@@ -49,6 +49,14 @@ export default function Dashboard() {
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [trendRange, setTrendRange] = useState<'12m' | '6m'>('12m');
+  const [isContentLoading, setIsContentLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredTrends =
     trendRange === '6m' ? registrationTrends.slice(-6) : registrationTrends;
@@ -81,7 +89,7 @@ export default function Dashboard() {
     <DashboardLayout>
       <div className="space-y-6 sm:space-y-8 pb-12">
         {/* Welcome Greeting Header */}
-        <div className="rounded-2xl bg-gray-500 p-6 sm:p-7 text-white shadow-lg shadow-blue-500/10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 p-6 sm:p-7 text-white shadow-lg shadow-blue-500/10 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans">
             Good morning, Dr. Alex Morgan
           </h1>
@@ -123,6 +131,7 @@ export default function Dashboard() {
             changePeriod="vs. last month"
             icon={Stethoscope}
             variant="blue"
+            isLoading={isContentLoading}
           />
           <StatCard
             title="Active Patients"
@@ -131,6 +140,7 @@ export default function Dashboard() {
             changePeriod="vs. last month"
             icon={Users}
             variant="teal"
+            isLoading={isContentLoading}
           />
           <StatCard
             title="New Admissions"
@@ -139,6 +149,7 @@ export default function Dashboard() {
             changePeriod="last 30 days"
             icon={UserPlus}
             variant="indigo"
+            isLoading={isContentLoading}
           />
           <StatCard
             title="Avg Caseload / Doctor"
@@ -147,6 +158,7 @@ export default function Dashboard() {
             changePeriod="capacity index"
             icon={Activity}
             variant="slate"
+            isLoading={isContentLoading}
           />
         </div>
 
@@ -157,6 +169,8 @@ export default function Dashboard() {
             <ChartCard
               title="Patient Registration & Admission Trend"
               subtitle="Monthly inbound admissions and surgical registrations"
+              isLoading={isContentLoading}
+              loadingMessage="Loading admission trends..."
               action={
                 <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold text-slate-600">
                   <button
@@ -259,6 +273,8 @@ export default function Dashboard() {
             <ChartCard
               title="Specialization Distribution"
               subtitle="Physician breakdown by medical discipline"
+              isLoading={isContentLoading}
+              loadingMessage="Loading discipline metrics..."
             >
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -311,6 +327,8 @@ export default function Dashboard() {
         <ChartCard
           title="Caseload Distribution: Patients per Attending Physician"
           subtitle="Real-time patient count monitored against recommended clinical ratios"
+          isLoading={isContentLoading}
+          loadingMessage="Loading caseload telemetry..."
           action={
             <Link
               href="/doctors"
@@ -379,30 +397,37 @@ export default function Dashboard() {
                 </Link>
               </div>
 
-              <div className="divide-y divide-slate-100">
-                {recentPatients.map((pat) => (
-                  <div key={pat.id} className="py-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-9 w-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 ring-1 ring-blue-100">
-                        {pat.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
+              {isContentLoading ? (
+                <div className="py-12 flex flex-col items-center justify-center gap-2">
+                  <div className="h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs text-slate-400 font-medium">Loading admission records...</span>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {recentPatients.map((pat) => (
+                    <div key={pat.id} className="py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-9 w-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 ring-1 ring-blue-100">
+                          {pat.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-900 truncate">{pat.name}</p>
+                          <p className="text-[11px] text-slate-500 truncate">
+                            {pat.condition} • {pat.doctorName}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-900 truncate">{pat.name}</p>
-                        <p className="text-[11px] text-slate-500 truncate">
-                          {pat.condition} • {pat.doctorName}
-                        </p>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <StatusBadge status={pat.status} size="sm" />
+                      <div className="flex items-center gap-2 shrink-0">
+                        <StatusBadge status={pat.status} size="sm" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="pt-3.5 border-t border-slate-100 mt-2">
@@ -433,39 +458,46 @@ export default function Dashboard() {
                 </Link>
               </div>
 
-              <div className="divide-y divide-slate-100">
-                {recentDoctors.map((doc) => (
-                  <div key={doc.id} className="py-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={doc.avatarUrl}
-                        alt={doc.name}
-                        className="h-10 w-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <Link
-                          href={`/doctors/${doc.id}`}
-                          className="text-xs font-bold text-slate-900 hover:text-blue-600 transition-colors truncate block"
-                        >
-                          {doc.name}
-                        </Link>
-                        <p className="text-[11px] text-slate-500 truncate">
-                          {doc.specialization} • {doc.hospital}
-                        </p>
+              {isContentLoading ? (
+                <div className="py-12 flex flex-col items-center justify-center gap-2">
+                  <div className="h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs text-slate-400 font-medium">Loading active physician roster...</span>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {recentDoctors.map((doc) => (
+                    <div key={doc.id} className="py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src={doc.avatarUrl}
+                          alt={doc.name}
+                          className="h-10 w-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <Link
+                            href={`/doctors/${doc.id}`}
+                            className="text-xs font-bold text-slate-900 hover:text-blue-600 transition-colors truncate block"
+                          >
+                            {doc.name}
+                          </Link>
+                          <p className="text-[11px] text-slate-500 truncate">
+                            {doc.specialization} • {doc.hospital}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-bold text-slate-900 block">
+                          {doc.patientsCount} patients
+                        </span>
+                        <span className="text-[10px] text-amber-600 font-bold flex items-center justify-end gap-1">
+                          ★ {doc.rating.toFixed(1)} rating
+                        </span>
                       </div>
                     </div>
-
-                    <div className="text-right shrink-0">
-                      <span className="text-xs font-bold text-slate-900 block">
-                        {doc.patientsCount} patients
-                      </span>
-                      <span className="text-[10px] text-amber-600 font-bold flex items-center justify-end gap-1">
-                        ★ {doc.rating.toFixed(1)} rating
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="pt-3.5 border-t border-slate-100 mt-2">

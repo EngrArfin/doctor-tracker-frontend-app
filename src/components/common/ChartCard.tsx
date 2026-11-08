@@ -10,6 +10,8 @@ interface ChartCardProps {
   children: ReactNode;
   className?: string;
   contentClassName?: string;
+  isLoading?: boolean;
+  loadingMessage?: string;
 }
 
 export const ChartCard: React.FC<ChartCardProps> = ({
@@ -19,6 +21,8 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   children,
   className,
   contentClassName,
+  isLoading,
+  loadingMessage,
 }) => {
   return (
     <div
@@ -40,7 +44,16 @@ export const ChartCard: React.FC<ChartCardProps> = ({
       </div>
 
       <div className={cn('w-full flex-1 min-h-[260px]', contentClassName)}>
-        {children}
+        {isLoading ? (
+          <div className="h-full min-h-[240px] flex flex-col items-center justify-center gap-2 text-slate-400">
+            <div className="h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs font-medium text-slate-500">
+              {loadingMessage || 'Loading chart telemetry...'}
+            </span>
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </div>
   );

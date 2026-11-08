@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   UserPlus,
@@ -35,6 +35,14 @@ export default function Patients() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 7;
+  const [isContentLoading, setIsContentLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -242,7 +250,12 @@ export default function Patients() {
 
         {/* Patients Data Table */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-          {paginatedPatients.length === 0 ? (
+          {isContentLoading ? (
+            <div className="w-full p-16 text-center bg-white flex flex-col items-center justify-center gap-3">
+              <div className="h-8 w-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs font-semibold text-slate-500">Loading patient clinical records...</p>
+            </div>
+          ) : paginatedPatients.length === 0 ? (
             <EmptyState
               title="No patients found"
               description="No patient records matched your active search query or filter criteria."
@@ -266,25 +279,25 @@ export default function Patients() {
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <tr>
-                    <th scope="col" className="px-5 py-3.5">
+                    <th scope="col" className="px-5 py-3.5 whitespace-nowrap">
                       Patient
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Vitals / Age
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Diagnosis Condition
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Assigned Physician
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Admission Date
                     </th>
-                    <th scope="col" className="px-4 py-3.5">
+                    <th scope="col" className="px-4 py-3.5 whitespace-nowrap">
                       Status
                     </th>
-                    <th scope="col" className="px-5 py-3.5 text-right">
+                    <th scope="col" className="px-5 py-3.5 text-right whitespace-nowrap">
                       Actions
                     </th>
                   </tr>
@@ -296,7 +309,7 @@ export default function Patients() {
                       className="hover:bg-slate-50/70 transition-colors group"
                     >
                       {/* Name & Contact */}
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0 ring-1 ring-teal-200/60 shadow-2xs">
                             {pat.name
@@ -304,11 +317,11 @@ export default function Patients() {
                               .map((n) => n[0])
                               .join('')}
                           </div>
-                          <div>
-                            <span className="font-bold text-slate-900 block text-sm">
+                          <div className="min-w-0">
+                            <span className="font-bold text-slate-900 block text-sm truncate max-w-[150px] sm:max-w-[200px]" title={pat.name}>
                               {pat.name}
                             </span>
-                            <span className="text-xs text-slate-400 block truncate max-w-[180px]">
+                            <span className="text-xs text-slate-400 block truncate max-w-[150px] sm:max-w-[200px]" title={pat.email}>
                               {pat.email}
                             </span>
                           </div>
@@ -316,7 +329,7 @@ export default function Patients() {
                       </td>
 
                       {/* Age & Blood Group */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="space-y-1">
                           <span className="text-xs text-slate-700 block font-semibold">
                             {pat.age} yrs • {pat.gender}
@@ -328,26 +341,27 @@ export default function Patients() {
                       </td>
 
                       {/* Condition */}
-                      <td className="px-4 py-4">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 font-semibold text-xs border border-teal-200/60">
-                          <HeartPulse className="h-3 w-3 text-teal-600" />
-                          {pat.condition}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 font-semibold text-xs border border-teal-200/60 max-w-[180px] sm:max-w-[220px]">
+                          <HeartPulse className="h-3 w-3 text-teal-600 shrink-0" />
+                          <span className="truncate" title={pat.condition}>{pat.condition}</span>
                         </span>
                       </td>
 
                       {/* Doctor */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <Link
                           href={`/doctors/${pat.doctorId}`}
-                          className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-xs font-semibold group-hover:underline"
+                          title={pat.doctorName}
+                          className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-xs font-semibold group-hover:underline max-w-[150px] sm:max-w-[180px]"
                         >
                           <Stethoscope className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                          <span>{pat.doctorName}</span>
+                          <span className="truncate">{pat.doctorName}</span>
                         </Link>
                       </td>
 
                       {/* Admission Date */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-1.5 text-slate-600 text-xs font-mono">
                           <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                           <span>{pat.registeredDate}</span>
@@ -355,12 +369,12 @@ export default function Patients() {
                       </td>
 
                       {/* Status */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <StatusBadge status={pat.status} size="sm" />
                       </td>
 
                       {/* Actions */}
-                      <td className="px-5 py-4 text-right">
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"

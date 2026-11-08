@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -49,6 +49,14 @@ export default function DoctorDetails() {
   const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
   const [patientToRemove, setPatientToRemove] = useState<{ id: string; name: string } | null>(null);
   const [isEditDoctorModalOpen, setIsEditDoctorModalOpen] = useState(false);
+  const [isContentLoading, setIsContentLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Edit doctor local form state
   const [editHospital, setEditHospital] = useState(doctor?.hospital || '');
@@ -306,7 +314,12 @@ export default function DoctorDetails() {
             </button>
           </div>
 
-          {associatedPatients.length === 0 ? (
+          {isContentLoading ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-3">
+              <div className="h-7 w-7 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs font-semibold text-slate-500">Loading assigned patient records...</p>
+            </div>
+          ) : associatedPatients.length === 0 ? (
             <div className="py-8">
               <EmptyState
                 title="No patients currently assigned"
@@ -327,46 +340,52 @@ export default function DoctorDetails() {
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
                   <tr>
-                    <th className="px-4 py-3">Patient Name</th>
-                    <th className="px-4 py-3">Condition / Diagnosis</th>
-                    <th className="px-4 py-3">Contact</th>
-                    <th className="px-4 py-3">Blood Group</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Admitted Date</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Patient Name</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Condition / Diagnosis</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Contact</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Blood Group</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Status</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Admitted Date</th>
+                    <th className="px-4 py-3 text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                   {associatedPatients.map((pat) => (
                     <tr key={pat.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-2.5">
                           <div className="h-8 w-8 rounded-full bg-teal-50 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 ring-1 ring-teal-100">
                             {pat.name.slice(0, 2).toUpperCase()}
                           </div>
-                          <div>
-                            <span className="font-semibold text-slate-900 block">{pat.name}</span>
+                          <div className="min-w-0">
+                            <span className="font-semibold text-slate-900 block truncate max-w-[150px] sm:max-w-[200px]" title={pat.name}>
+                              {pat.name}
+                            </span>
                             <span className="text-[11px] text-slate-400 block">{pat.gender}, {pat.age} yrs</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 font-semibold text-slate-900">
-                        {pat.condition}
+                      <td className="px-4 py-3.5 font-semibold text-slate-900 whitespace-nowrap">
+                        <span className="truncate max-w-[150px] sm:max-w-[200px] block" title={pat.condition}>
+                          {pat.condition}
+                        </span>
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-slate-500">
-                        <div>{pat.email}</div>
-                        <div>{pat.phone}</div>
+                      <td className="px-4 py-3.5 text-xs text-slate-500 whitespace-nowrap">
+                        <div className="truncate max-w-[140px] sm:max-w-[180px]" title={pat.email}>{pat.email}</div>
+                        <div className="font-mono">{pat.phone}</div>
                       </td>
-                      <td className="px-4 py-3.5 text-xs font-semibold text-slate-700">
-                        {pat.bloodGroup || 'N/A'}
+                      <td className="px-4 py-3.5 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                          {pat.bloodGroup || 'N/A'}
+                        </span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5 whitespace-nowrap">
                         <StatusBadge status={pat.status} size="sm" />
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-slate-500">
+                      <td className="px-4 py-3.5 text-xs text-slate-500 whitespace-nowrap font-mono">
                         {pat.registeredDate}
                       </td>
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
                         <button
                           type="button"
                           onClick={() => setPatientToRemove({ id: pat.id, name: pat.name })}

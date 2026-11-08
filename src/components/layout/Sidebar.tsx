@@ -31,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { doctors, patients, resetDemoData } = useDoctorTracker();
+  const { doctors, patients, resetData } = useDoctorTracker();
 
   const handleLogout = () => {
     router.push('/login');
@@ -209,11 +209,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <button
               type="button"
-              onClick={resetDemoData}
+              onClick={resetData}
               className="mt-2.5 w-full py-1 px-2 text-[10px] font-semibold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200/70 rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-2xs"
             >
               <RotateCcw className="h-3 w-3 text-slate-400" />
-              <span>Reset Demo Baseline</span>
+              <span>Reset  Baseline</span>
             </button>
           </div>
         </div>

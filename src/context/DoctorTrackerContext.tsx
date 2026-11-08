@@ -32,7 +32,7 @@ interface DoctorTrackerContextType {
   updatePatient: (id: string, updates: Partial<Patient>) => void;
   getDoctorById: (id: string) => Doctor | undefined;
   getPatientsByDoctorId: (doctorId: string) => Patient[];
-  resetDemoData: () => void;
+  resetData: () => void;
 }
 
 const DoctorTrackerContext = createContext<DoctorTrackerContextType | undefined>(undefined);
@@ -233,7 +233,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
   const getPatientsByDoctorId = (doctorId: string) =>
     patients.filter((p) => p.doctorId === doctorId);
 
-  const resetDemoData = () => {
+  const resetData = () => {
     setDoctors(INITIAL_DOCTORS);
     setPatients(INITIAL_PATIENTS);
     try {
@@ -242,7 +242,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
     } catch (e) {
       console.warn(e);
     }
-    toast.info('Demo Data Reset', {
+    toast.info(' Data Reset', {
       description: 'Directory records restored to original clinical baseline.',
     });
   };
@@ -264,7 +264,7 @@ export const DoctorTrackerProvider: React.FC<{ children: ReactNode }> = ({ child
         updatePatient,
         getDoctorById,
         getPatientsByDoctorId,
-        resetDemoData,
+        resetData,
       }}
     >
       {children}
