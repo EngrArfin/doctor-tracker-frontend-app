@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   description:
     "A modern, high-performance healthcare administrative dashboard engineered for clinical operations leads and hospital administrators.",
   icons: {
-    icon: "/doctortrackerLogo.png",
-    shortcut: "/doctortrackerLogo.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
     apple: "/doctortrackerLogo.png",
   },
 };

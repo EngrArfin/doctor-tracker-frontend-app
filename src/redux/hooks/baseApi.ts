@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 
-const baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:3000";
+const rawEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:3000";
+const baseURL = rawEndpoint.replace(/\/+$/, "");
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: baseURL,
